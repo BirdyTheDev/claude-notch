@@ -52,6 +52,8 @@ disappears from the tab bar.
 - **Claude** — which terminal to use, extra `claude` arguments, whether to show usage.
 - **Actions** and **Commands** — add, edit, reorder, choose an icon and a target folder.
 
+<img src="docs/settings-modules.png" width="49%"> <img src="docs/settings-appearance.png" width="49%">
+
 ## Install
 
 ```bash
