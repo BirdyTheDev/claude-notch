@@ -6,10 +6,9 @@ whichever of those you actually want, in whatever order you want them.
 
 <sub>macOS 14+ · Apple Silicon · no dependencies</sub>
 
-![closed](docs/closed.png)
+![demo](docs/demo.gif)
 
-![system](docs/system.png)
-![awake](docs/power.png)
+![closed](docs/closed.png)
 
 ## How it works
 
@@ -60,6 +59,10 @@ disappears from the tab bar.
 ./install.sh    # installs the hook, wires up settings.json, launches the app
 ./uninstall.sh  # puts everything back
 ```
+
+`build.sh` signs the app ad-hoc, which is fine when you build it yourself. A downloaded
+build has to be signed with a Developer ID and notarised or macOS will refuse to open it —
+`release.sh` does that end to end and spells out the one-time setup it needs.
 
 `install.sh` copies the hook into `~/.claude/hooks/`, backs up `~/.claude/settings.json`
 and adds the hook entries. Nothing else is touched.
@@ -113,6 +116,7 @@ for anything, and only when you enable them.
   green waiting for you, amber waiting for approval.
 - Each `./build.sh` produces a fresh ad-hoc signature. macOS ties permissions to the
   signature, so Automation and Calendar access may be asked for again after a rebuild.
-- The Claude starburst is Anthropic's trademark; the path data comes from Simple Icons
-  (CC0). Fine for a personal build — check for yourself before distributing anything with
-  it.
+- Not affiliated with, endorsed by, or sponsored by Anthropic. "Claude" and the Claude
+  starburst are Anthropic's trademarks; the path data for the mark comes from Simple Icons
+  (CC0). This is a personal tool that talks to Claude Code — if you fork it for wider
+  distribution, look at the naming and the icon first.
