@@ -10,12 +10,12 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-APP_NAME="Claude Notch"
+APP_NAME="Notchpad"
 IDENTITY="${IDENTITY:-$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | sed 's/.*"\(.*\)"/\1/')}"
 PROFILE="${NOTARY_PROFILE:-notary}"
 STAGE="$(mktemp -d)"
 VERSION="$(grep '^VERSION=' build.sh | cut -d'"' -f2)"
-DMG="dist/ClaudeNotch-$VERSION.dmg"
+DMG="dist/Notchpad-$VERSION.dmg"
 
 [ -n "$IDENTITY" ] || { echo "No Developer ID Application certificate found."; exit 1; }
 echo "-> identity: $IDENTITY"

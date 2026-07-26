@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "ClaudeNotch",
+    name: "Notchpad",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "ClaudeNotch",
-            path: "Sources/ClaudeNotch",
+            name: "Notchpad",
+            path: "Sources/Notchpad",
             swiftSettings: [.swiftLanguageMode(.v5)]
         )
     ]

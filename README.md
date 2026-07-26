@@ -1,8 +1,9 @@
-# Claude Notch
+# Notchpad
 
-Turns the MacBook notch into a small control panel. Live Claude Code sessions, token
-usage, a file shelf, system readouts, a keep-awake switch, a timer, your own commands —
-whichever of those you actually want, in whatever order you want them.
+A modular panel in the MacBook notch. You decide what goes in it: a file shelf, system
+and memory readouts, a keep-awake switch, a pomodoro, your own shell commands, Unity
+projects, MCP server health — and live Claude Code sessions with their token usage.
+Enable the modules you want, drop the ones you don't, order them however you like.
 
 <sub>macOS 14+ · Apple Silicon · no dependencies</sub>
 
@@ -57,7 +58,7 @@ disappears from the tab bar.
 ## Install
 
 ```bash
-./build.sh      # builds /Applications/Claude Notch.app, icon included
+./build.sh      # builds /Applications/Notchpad.app, icon included
 ./install.sh    # installs the hook, wires up settings.json, launches the app
 ./uninstall.sh  # puts everything back
 ```
@@ -90,7 +91,7 @@ for anything, and only when you enable them.
 | `Sensors.swift` | CPU, memory, disk, network and battery via `host_processor_info`, `host_statistics64`, `getifaddrs` and `IOPSCopyPowerSourcesInfo` |
 | `Mascot.swift`, `ClaudeMark.swift` | The animated mark and a small SVG path parser |
 | `UsageStore.swift` | Reads transcripts incrementally and caches per-day, per-model and per-project totals so a restart doesn't re-parse a week of JSONL |
-| `SessionServer.swift` | Unix socket at `/tmp/claude-notch.sock` for hook events |
+| `SessionServer.swift` | Unix socket at `/tmp/notchpad.sock` for hook events |
 | `Launcher.swift` | Opens a terminal through a temporary `.command` file; terminal list; login item |
 | `Hotkey.swift` | Carbon `RegisterEventHotKey`, so no Accessibility permission is needed |
 | `Prefs.swift`, `SettingsView.swift` | Every setting, and the settings window |
@@ -108,7 +109,7 @@ for anything, and only when you enable them.
   setting to turn that off.
 - **Lid-closed keep-awake** changes a system-wide setting (`pmset disablesleep`). The app
   never leaves it on by itself: an admin-authorised helper flips it and puts it back when
-  its deadline passes **or** when `/tmp/claude-notch-lid-awake` disappears. So a crash, a
+  its deadline passes **or** when `/tmp/notchpad-lid-awake` disappears. So a crash, a
   force-quit or deleting the app can't leave the Mac unable to sleep. The Undo button just
   removes that file.
 - Every other keep-awake mode is a power assertion and dies with the process. No password.
@@ -118,7 +119,7 @@ for anything, and only when you enable them.
   green waiting for you, amber waiting for approval.
 - Each `./build.sh` produces a fresh ad-hoc signature. macOS ties permissions to the
   signature, so Automation and Calendar access may be asked for again after a rebuild.
-- Not affiliated with, endorsed by, or sponsored by Anthropic. "Claude" and the Claude
-  starburst are Anthropic's trademarks; the path data for the mark comes from Simple Icons
-  (CC0). This is a personal tool that talks to Claude Code — if you fork it for wider
-  distribution, look at the naming and the icon first.
+- Not affiliated with, endorsed by, or sponsored by Anthropic. The Claude modules talk to
+  Claude Code on your machine, and the Claude mark appears inside those modules as a status
+  indicator — path data from Simple Icons (CC0), the mark itself is Anthropic's trademark.
+  Everything else, including the app icon, is original.

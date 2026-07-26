@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Claude Notch hook — pushes session state to the notch app over a Unix socket.
+"""Notchpad hook — pushes session state to the notch app over a Unix socket.
 
 Fire-and-forget: never blocks Claude Code, never fails a turn.
 """
@@ -9,7 +9,7 @@ import socket
 import subprocess
 import sys
 
-SOCKET_PATH = "/tmp/claude-notch.sock"
+SOCKET_PATH = "/tmp/notchpad.sock"
 TIMEOUT = 1.5
 
 STATUS = {

@@ -72,6 +72,7 @@ final class Prefs: ObservableObject {
     @Published var commands: [QuickCommand] { didSet { saveCommands() } }
 
     private init() {
+        Prefs.migrateFromLegacyDomain(into: d)
         d.register(defaults: [
             "hoverToOpen": true, "showUsage": true, "mascotEyes": true, "hotkeyEnabled": true,
             "panelWidth": 580.0, "cornerRadius": 26.0, "panelOpacity": 1.0, "hoverDelay": 0.0,
@@ -105,6 +106,23 @@ final class Prefs: ObservableObject {
         breakMinutes = d.double(forKey: "breakMinutes")
         weatherCity = d.string(forKey: "weatherCity") ?? ""
         commands = Prefs.loadCommands(d) ?? QuickCommand.samples
+    }
+
+    /// The app was called Claude Notch until 2.3. Carry the old preferences and support
+    /// folder over so an existing setup survives the rename.
+    private static func migrateFromLegacyDomain(into d: UserDefaults) {
+        guard d.object(forKey: "migratedFromClaudeNotch") == nil else { return }
+        let legacy = "com.claudenotch.app"
+        if let old = UserDefaults(suiteName: legacy)?.persistentDomain(forName: legacy) {
+            for (key, value) in old where d.object(forKey: key) == nil { d.set(value, forKey: key) }
+        }
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let from = support.appendingPathComponent("ClaudeNotch")
+        let to = support.appendingPathComponent("Notchpad")
+        if FileManager.default.fileExists(atPath: from.path), !FileManager.default.fileExists(atPath: to.path) {
+            try? FileManager.default.moveItem(at: from, to: to)
+        }
+        d.set(true, forKey: "migratedFromClaudeNotch")
     }
 
     /// Enabled modules in the user's order — what the tab bar shows.

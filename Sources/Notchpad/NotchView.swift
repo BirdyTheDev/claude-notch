@@ -328,5 +328,5 @@ struct VisualEffectBackdrop: NSViewRepresentable {
 }
 
 extension Notification.Name {
-    static let openPreferences = Notification.Name("ClaudeNotch.openPreferences")
+    static let openPreferences = Notification.Name("Notchpad.openPreferences")
 }

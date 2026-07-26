@@ -50,7 +50,7 @@ enum LoginItem {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            NSLog("ClaudeNotch: login item → \(error)")
+            NSLog("Notchpad: login item → \(error)")
             Launcher.onError?(enabled ? "Could not enable launch at login" : "Could not disable launch at login")
         }
         return isEnabled
@@ -74,7 +74,7 @@ enum Launcher {
 
     private static var launchDir: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("ClaudeNotch/launch", isDirectory: true)
+            .appendingPathComponent("Notchpad/launch", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         return base
     }
@@ -116,7 +116,7 @@ enum Launcher {
             try script.write(to: file, atomically: true, encoding: .utf8)
             try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: file.path)
         } catch {
-            NSLog("ClaudeNotch: could not write launch script — \(error)")
+            NSLog("Notchpad: could not write launch script — \(error)")
             onError?("Could not write the launch script")
             return
         }
@@ -125,7 +125,7 @@ enum Launcher {
         config.activates = true
         NSWorkspace.shared.open([file], withApplicationAt: terminal.url, configuration: config) { _, error in
             guard let error else { return }
-            NSLog("ClaudeNotch: launch failed — \(error)")
+            NSLog("Notchpad: launch failed — \(error)")
             DispatchQueue.main.async { onError?("Could not open \(terminal.name)") }
         }
     }

@@ -1,6 +1,5 @@
-// Build-time only: renders AppIcon.iconset from the Claude mark.
-// Not part of the app target.
-//   swiftc Support/make-icon.swift Sources/ClaudeNotch/ClaudeMark.swift -o /tmp/make-icon
+// Build-time only: renders AppIcon.iconset. Not part of the app target.
+//   swiftc Support/make-icon.swift -o /tmp/make-icon
 //   /tmp/make-icon <out.iconset>
 import AppKit
 import SwiftUI
@@ -39,19 +38,55 @@ func render(size: CGFloat) -> Data? {
                           end: CGPoint(x: plate.maxX, y: plate.minY), options: [])
     cg.restoreGState()
 
-    // Mark, centred, in Claude orange.
-    let markSize = size * 0.54
-    let markRect = CGRect(x: (size - markSize) / 2, y: (size - markSize) / 2, width: markSize, height: markSize)
-    var path = ClaudeMark().path(in: markRect).cgPath
-    // Flip: SVG is y-down, the bitmap context is y-up.
-    var flip = CGAffineTransform(translationX: 0, y: size).scaledBy(x: 1, y: -1)
-    path = path.copy(using: &flip) ?? path
+    // A screen with a notch bitten out of its top edge, and the tiles you slot under it.
+    let orange = CGColor(srgbRed: 0.851, green: 0.467, blue: 0.341, alpha: 1)
+    let screenW = size * 0.50, screenH = size * 0.44
+    let screen = CGRect(x: (size - screenW) / 2, y: (size - screenH) / 2 + size * 0.02,
+                        width: screenW, height: screenH)
 
     cg.saveGState()
-    cg.addPath(path)
-    cg.setFillColor(CGColor(srgbRed: 0.851, green: 0.467, blue: 0.341, alpha: 1))
-    cg.fillPath()
+    let body = CGMutablePath()
+    let corner = screenH * 0.22
+    let notchW = screenW * 0.42, notchH = screenH * 0.13, notchR = notchH * 0.55
+    let top = screen.maxY, midX = screen.midX
+    body.move(to: CGPoint(x: screen.minX + corner, y: top))
+    body.addLine(to: CGPoint(x: midX - notchW / 2, y: top))
+    body.addLine(to: CGPoint(x: midX - notchW / 2, y: top - notchH + notchR))
+    body.addQuadCurve(to: CGPoint(x: midX - notchW / 2 + notchR, y: top - notchH),
+                      control: CGPoint(x: midX - notchW / 2, y: top - notchH))
+    body.addLine(to: CGPoint(x: midX + notchW / 2 - notchR, y: top - notchH))
+    body.addQuadCurve(to: CGPoint(x: midX + notchW / 2, y: top - notchH + notchR),
+                      control: CGPoint(x: midX + notchW / 2, y: top - notchH))
+    body.addLine(to: CGPoint(x: midX + notchW / 2, y: top))
+    body.addLine(to: CGPoint(x: screen.maxX - corner, y: top))
+    body.addQuadCurve(to: CGPoint(x: screen.maxX, y: top - corner), control: CGPoint(x: screen.maxX, y: top))
+    body.addLine(to: CGPoint(x: screen.maxX, y: screen.minY + corner))
+    body.addQuadCurve(to: CGPoint(x: screen.maxX - corner, y: screen.minY), control: CGPoint(x: screen.maxX, y: screen.minY))
+    body.addLine(to: CGPoint(x: screen.minX + corner, y: screen.minY))
+    body.addQuadCurve(to: CGPoint(x: screen.minX, y: screen.minY + corner), control: CGPoint(x: screen.minX, y: screen.minY))
+    body.addLine(to: CGPoint(x: screen.minX, y: top - corner))
+    body.addQuadCurve(to: CGPoint(x: screen.minX + corner, y: top), control: CGPoint(x: screen.minX, y: top))
+    body.closeSubpath()
+    cg.addPath(body)
+    cg.setStrokeColor(orange)
+    cg.setLineWidth(max(1, size * 0.032))
+    cg.strokePath()
     cg.restoreGState()
+
+    // three tiles, the modules you drop in
+    let tileH = screenH * 0.13
+    let gap = screenH * 0.11
+    let sideInset = screenW * 0.16
+    let fullWidth = screenW - sideInset * 2
+    // widest at the top, tapering down — a stack of modules sitting under the notch
+    var y = screen.minY + screenH * 0.17
+    for (index, width) in [fullWidth * 0.45, fullWidth * 0.72, fullWidth].enumerated() {
+        let tile = CGRect(x: screen.minX + sideInset, y: y, width: width, height: tileH)
+        cg.addPath(CGPath(roundedRect: tile, cornerWidth: tileH / 2, cornerHeight: tileH / 2, transform: nil))
+        cg.setFillColor(orange.copy(alpha: 0.55 + 0.15 * Double(index)) ?? orange)
+        cg.fillPath()
+        y += tileH + gap
+    }
 
     NSGraphicsContext.restoreGraphicsState()
     return rep.representation(using: .png, properties: [:])

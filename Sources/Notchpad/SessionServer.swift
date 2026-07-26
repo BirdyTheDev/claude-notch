@@ -27,10 +27,10 @@ struct HookEvent {
 
 /// Listens on a Unix socket for hook events fired by Claude Code.
 final class SessionServer {
-    static let socketPath = "/tmp/claude-notch.sock"
+    static let socketPath = "/tmp/notchpad.sock"
 
     private var listenFD: Int32 = -1
-    private let queue = DispatchQueue(label: "com.claudenotch.socket")
+    private let queue = DispatchQueue(label: "com.notchpad.socket")
     private var source: DispatchSourceRead?
     private let onEvent: (HookEvent) -> Void
 
@@ -41,7 +41,7 @@ final class SessionServer {
     func start() {
         unlink(SessionServer.socketPath)
         let fd = socket(AF_UNIX, SOCK_STREAM, 0)
-        guard fd >= 0 else { NSLog("ClaudeNotch: socket() failed"); return }
+        guard fd >= 0 else { NSLog("Notchpad: socket() failed"); return }
 
         var addr = sockaddr_un()
         addr.sun_family = sa_family_t(AF_UNIX)
@@ -58,7 +58,7 @@ final class SessionServer {
             $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, size) }
         }
         guard bound == 0, listen(fd, 32) == 0 else {
-            NSLog("ClaudeNotch: bind/listen failed on \(path)")
+            NSLog("Notchpad: bind/listen failed on \(path)")
             close(fd)
             return
         }

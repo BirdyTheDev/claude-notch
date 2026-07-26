@@ -267,7 +267,7 @@ private struct ClaudeTab: View {
 
             Section {
                 LabeledContent("claude") { Text(Launcher.claudeBinary).font(.mono(10)).foregroundStyle(.secondary) }
-                LabeledContent("hook") { Text("~/.claude/hooks/claude-notch-hook.py").font(.mono(10)).foregroundStyle(.secondary) }
+                LabeledContent("hook") { Text("~/.claude/hooks/notchpad-hook.py").font(.mono(10)).foregroundStyle(.secondary) }
                 LabeledContent("socket") { Text(SessionServer.socketPath).font(.mono(10)).foregroundStyle(.secondary) }
             } header: { Text("Paths") }
         }
@@ -388,7 +388,7 @@ private struct AboutTab: View {
     var body: some View {
         VStack(spacing: 12) {
             ClaudeMark().fill(Prefs.shared.accentColor).frame(width: 54, height: 54)
-            Text("Claude Notch").font(.ui(17, .semibold))
+            Text("Notchpad").font(.ui(17, .semibold))
             Text("version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")")
                 .font(.ui(11)).foregroundStyle(.secondary)
             Text("Turns the MacBook notch into a Claude Code panel, a file shelf, a system monitor and a timer.")

@@ -39,7 +39,7 @@ final class PowerStore: ObservableObject {
     @Published private(set) var lidExpiry: Date?
 
     private var assertionID: IOPMAssertionID = 0
-    private let sentinel = "/tmp/claude-notch-lid-awake"
+    private let sentinel = "/tmp/notchpad-lid-awake"
 
     private init() {
         keepDisplayAwake = UserDefaults.standard.bool(forKey: "keepDisplayAwake")
@@ -114,7 +114,7 @@ final class PowerStore: ObservableObject {
             var id: IOPMAssertionID = 0
             let result = IOPMAssertionCreateWithName(type,
                                                      IOPMAssertionLevel(kIOPMAssertionLevelOn),
-                                                     "Claude Notch — keep awake" as CFString,
+                                                     "Notchpad — keep awake" as CFString,
                                                      &id)
             guard result == kIOReturnSuccess else {
                 Launcher.onError?("Could not keep the Mac awake")
@@ -152,7 +152,7 @@ final class PowerStore: ObservableObject {
 
         // The helper is written to disk rather than inlined, so nothing has to survive
         // three levels of shell/AppleScript quoting.
-        let helperPath = NSTemporaryDirectory() + "claude-notch-lid-helper.sh"
+        let helperPath = NSTemporaryDirectory() + "notchpad-lid-helper.sh"
         let helper = """
         #!/bin/sh
         /usr/bin/pmset -a disablesleep 1

@@ -3,8 +3,8 @@
 set -euo pipefail
 
 cd "$(dirname "$0")"
-APP_NAME="Claude Notch"
-BUNDLE_ID="com.claudenotch.app"
+APP_NAME="Notchpad"
+BUNDLE_ID="com.notchpad.app"
 VERSION="2.2.0"
 DEST="${1:-/Applications}"
 APP="$DEST/$APP_NAME.app"
@@ -12,14 +12,14 @@ ICNS=".build/AppIcon.icns"
 
 echo "-> building (release)"
 swift build -c release --arch arm64
-BIN="$(swift build -c release --arch arm64 --show-bin-path)/ClaudeNotch"
+BIN="$(swift build -c release --arch arm64 --show-bin-path)/Notchpad"
 
 # The icon is rendered from the same vector the mascot uses.
-if [ ! -f "$ICNS" ] || [ Sources/ClaudeNotch/ClaudeMark.swift -nt "$ICNS" ] || [ Support/make-icon.swift -nt "$ICNS" ]; then
+if [ ! -f "$ICNS" ] || [ Sources/Notchpad/ClaudeMark.swift -nt "$ICNS" ] || [ Support/make-icon.swift -nt "$ICNS" ]; then
     echo "-> rendering icon"
     TMP="$(mktemp -d)"
     cp Support/make-icon.swift "$TMP/main.swift"
-    swiftc -O "$TMP/main.swift" Sources/ClaudeNotch/ClaudeMark.swift -o "$TMP/make-icon"
+    swiftc -O "$TMP/main.swift" Sources/Notchpad/ClaudeMark.swift -o "$TMP/make-icon"
     "$TMP/make-icon" "$TMP/AppIcon.iconset" >/dev/null
     iconutil -c icns "$TMP/AppIcon.iconset" -o "$ICNS"
     rm -rf "$TMP"
@@ -29,7 +29,7 @@ echo "-> assembling bundle"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/$APP_NAME"
-cp Support/claude-notch-hook.py "$APP/Contents/Resources/"
+cp Support/notchpad-hook.py "$APP/Contents/Resources/"
 cp "$ICNS" "$APP/Contents/Resources/AppIcon.icns"
 
 cat > "$APP/Contents/Info.plist" <<PLIST

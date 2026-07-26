@@ -5,11 +5,11 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 CLAUDE_DIR="$HOME/.claude"
-HOOK="$CLAUDE_DIR/hooks/claude-notch-hook.py"
+HOOK="$CLAUDE_DIR/hooks/notchpad-hook.py"
 
 echo "-> installing hook"
 mkdir -p "$CLAUDE_DIR/hooks"
-cp Support/claude-notch-hook.py "$HOOK"
+cp Support/notchpad-hook.py "$HOOK"
 chmod +x "$HOOK"
 
 echo "-> wiring up settings.json"
@@ -37,9 +37,9 @@ command = f"python3 '{hook}'"
 for event, groups in list(hooks.items()):
     kept = []
     for group in groups:
+        stale = ("claude-island", "claude-notch-hook", "notchpad-hook")
         inner = [h for h in group.get("hooks", [])
-                 if "claude-island" not in h.get("command", "")
-                 and "claude-notch-hook" not in h.get("command", "")]
+                 if not any(name in h.get("command", "") for name in stale)]
         if inner:
             group["hooks"] = inner
             kept.append(group)
@@ -72,9 +72,9 @@ if pgrep -qf "Vibe Notch"; then
 fi
 
 echo "-> launching"
-pkill -f "Claude Notch.app" 2>/dev/null || true
+pkill -f "Notchpad.app" 2>/dev/null || true
 sleep 0.4
-open -a "/Applications/Claude Notch.app"
+open -a "/Applications/Notchpad.app"
 
 echo "Done. Look for the sparkle in the menu bar."
 echo "  Settings: menu bar sparkle -> Settings"

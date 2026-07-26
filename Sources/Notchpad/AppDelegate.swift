@@ -135,7 +135,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard status != lastIconStatus, let button = statusItem?.button else { return }
         lastIconStatus = status
         let name = status == .waitingForApproval ? "sparkle.magnifyingglass" : "sparkle"
-        guard let base = NSImage(systemSymbolName: name, accessibilityDescription: "Claude Notch") else { return }
+        guard let base = NSImage(systemSymbolName: name, accessibilityDescription: "Notchpad") else { return }
         if status == .idle {
             base.isTemplate = true
             button.image = base
@@ -250,7 +250,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func installMenuBarItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Claude Notch")
+        item.button?.image = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Notchpad")
         item.button?.image?.isTemplate = true
 
         let menu = NSMenu()
@@ -295,7 +295,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             let panel = SettingsPanel(contentRect: CGRect(x: 0, y: 0, width: 640, height: 470),
                                       styleMask: [.titled, .closable, .miniaturizable, .nonactivatingPanel],
                                       backing: .buffered, defer: false)
-            panel.title = "Claude Notch Settings"
+            panel.title = "Notchpad Settings"
             panel.contentView = ClickThroughHostingView(rootView: SettingsView())
             panel.isReleasedWhenClosed = false
             panel.hidesOnDeactivate = false
