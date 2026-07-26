@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var fastTimer: Timer?
     private var pointerTimer: Timer?
     private var collapseWork: DispatchWorkItem?
+    private var shrinkWork: DispatchWorkItem?
 
     private let clockFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -179,12 +180,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         guard let window else { return }
         let point = NSEvent.mouseLocation
 
-        // The panel window spans the whole top-centre area. A view-level hit test is not
-        // enough — the window itself would still swallow clicks meant for whatever is
-        // underneath — so it only accepts mouse events while the pointer is over it.
-        let live = state.dragging
-            || (state.expanded ? window.panelZone : window.hoverZone).contains(point)
-        if window.ignoresMouseEvents == live { window.ignoresMouseEvents = !live }
+        // The window is grown before the panel opens and shrunk once it has closed, so it
+        // never covers more of the screen than it draws on.
+        let open = state.expanded || state.dragging
+        if open {
+            shrinkWork?.cancel()
+            shrinkWork = nil
+            window.applyFrame(expanded: true)
+        } else if shrinkWork == nil {
+            let work = DispatchWorkItem { [weak self] in
+                guard let self, let window = self.window else { return }
+                if !self.state.expanded && !self.state.dragging { window.applyFrame(expanded: false) }
+                self.shrinkWork = nil
+            }
+            shrinkWork = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45, execute: work)
+        }
 
         if state.expanded {
             if !window.panelZone.contains(point) { scheduleCollapse() } else { cancelCollapse() }

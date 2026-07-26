@@ -50,7 +50,7 @@ final class NotchWindow: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         isMovable = false
         isMovableByWindowBackground = false
-        ignoresMouseEvents = true   // flipped on only while the pointer is over the island
+        ignoresMouseEvents = false
         hidesOnDeactivate = false
         isReleasedWhenClosed = false
         animationBehavior = .none
@@ -119,11 +119,32 @@ final class NotchWindow: NSPanel {
             }
         }
 
+        applyFrame(expanded: false)
         orderFrontRegardless()
     }
 
     override var canBecomeKey: Bool { false }
     override var canBecomeMain: Bool { false }
+
+    /// The window is only as big as what is on screen. Collapsed that is the island, so
+    /// clicks anywhere else reach whatever is underneath; open it covers the whole panel.
+    /// Toggling `ignoresMouseEvents` instead would keep the window out of drag sessions,
+    /// which AppKit decides on when the drag begins.
+    @MainActor
+    func applyFrame(expanded: Bool) {
+        let screen = NotchMetrics.screen
+        let notch = NotchMetrics.notchSize(for: screen)
+        let size = expanded
+            ? CGSize(width: NotchMetrics.maxPanelWidth + NotchMetrics.windowPadding * 2,
+                     height: NotchMetrics.maxExpandedHeight + NotchMetrics.windowPadding)
+            : CGSize(width: state.collapsedWidth(notch: notch) + 12, height: notch.height)
+        let frame = CGRect(x: screen.frame.midX - size.width / 2,
+                           y: screen.frame.maxY - size.height,
+                           width: size.width,
+                           height: size.height)
+        guard frame != self.frame else { return }
+        setFrame(frame, display: false)
+    }
 
     /// Screen-space rect of the hover zone that opens the panel.
     @MainActor
@@ -160,6 +181,13 @@ final class PassthroughView: NSView {
 
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
+        refreshDragRegistration()
+    }
+
+    /// AppKit works out which windows a drag may enter from the state it sees at the time.
+    /// Re-registering after the window becomes clickable again keeps it in that list.
+    func refreshDragRegistration() {
+        unregisterDraggedTypes()
         registerForDraggedTypes([.fileURL])
     }
 
